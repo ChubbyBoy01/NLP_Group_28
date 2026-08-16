@@ -1,10 +1,12 @@
-model,accuracy,precision_macro,recall_macro,f1_macro
-TF-IDF + SVM (baseline),0.8373,0.8132,0.7955,0.7973
-GloVe + SVM (Member 3 ML),0.6265,0.6513,0.5940,0.6032
-Word2Vec + SVM (variant),0.6145,0.6265,0.5864,0.5911
-GloVe + GRU (Member 3 DL),0.1566,0.1453,0.1411,0.1361
+                    model  accuracy  precision_macro  recall_macro  f1_macro
+  TF-IDF + SVM (baseline)    0.8373           0.8132        0.7955    0.7973
+GloVe + SVM (Member 3 ML)    0.6265           0.6513        0.5940    0.6032
+ Word2Vec + SVM (variant)    0.6145           0.6265        0.5864    0.5911
+GloVe + GRU (Member 3 DL)    0.1566           0.1453        0.1411    0.1361
 
 Best by macro-F1: TF-IDF + SVM (baseline)
 
-
+Model,Accuracy,Precision (macro),Recall (macro),F1-Score (macro)
+SVM,0.9948186528497409,0.9933333333333334,0.9963636363636365,0.9944588744588745
+GRU,0.9689119170984456,0.9741414141414141,0.9613636363636364,0.9606263736263736
 
