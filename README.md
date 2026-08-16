@@ -45,6 +45,8 @@ all metrics are macro-averaged and all models are trained with balanced class we
 NLP_Group_05/
 ├── data/                  # dataset / download script
 ├── notebooks/             # one notebook per member
+│   ├── Member1_LogisticRegression_LSTM.ipynb
+│   ├── Member2_NaiveBayes_CNN.ipynb
 │   └── Member3_SVM_GRU.ipynb
 ├── src/
 │   ├── preprocessing.py   # shared NLP pipeline (imported by notebooks AND the app)
@@ -95,19 +97,44 @@ masked text the model actually received.
 ## Results
 
 Metrics are out-of-fold predictions from stratified 5-fold cross-validation on the 166
-unique resumes, so every document is scored by a model that never saw it. Fill in the final
-figures after running the notebook.
+unique resumes, so every document is scored by a model that never saw it.
 
 | Member | Model | Accuracy | Macro-F1 |
 |---|---|---|---|
-| Member 1 | Logistic Regression | | |
-| Member 1 | LSTM | | |
-| Member 2 | Naive Bayes | | |
-| Member 2 | CNN | | |
-| Member 3 | SVM | | |
-| Member 3 | GRU | | |
+| Member 1 | Logistic Regression | *re-run pending* | *re-run pending* |
+| Member 1 | LSTM | *re-run pending* | *re-run pending* |
+| Member 2 | Naive Bayes | *re-run pending* | *re-run pending* |
+| Member 2 | CNN | *re-run pending* | *re-run pending* |
+| Member 3 | **SVM (LinearSVC, word+char TF-IDF)** | **0.898** | **0.884** |
+| Member 3 | SVM (GloVe mean-pooled) | 0.627 | 0.603 |
+| Member 3 | GRU (GloVe, mean-pooled) | 0.524 | 0.465 |
 
-**Deployed model:** *(fill in after the group comparison)*
+> Members 1 and 2 evaluated before de-duplication was applied, so their current figures
+> (0.98–0.99) are measured on test sets containing resumes the models had already seen. They
+> are not comparable with Member 3's and are excluded until the notebooks are re-run. See
+> `FIXES.md`.
+
+**Member 3's final models**
+
+- **ML — SVM.** `LinearSVC` over a union of word (1–2) and character (3–5) TF-IDF features.
+  One-vs-rest beats `SVC(kernel='linear')`'s one-vs-one here because several categories have
+  only 3–6 examples. Character n-grams let `node.js`, `nodejs` and `node js` share evidence.
+- **DL — GRU.** GloVe-initialised embedding (frozen), `GRU(32, return_sequences=True)` with
+  mean-pooling over all timesteps, 100-token sequences. Taking the last hidden state instead
+  scores 0.14; averaging every timestep and freezing the embedding lifts it to 0.47.
+
+The GRU still loses, and that is the finding to report rather than hide: with ~125 training
+documents across 25 categories, a recurrent network cannot learn sequence structure, and
+resumes are keyword lists where word order carries little signal anyway. TF-IDF extracts the
+same information by counting, with nothing to fit.
+
+**Deployed model:** SVM (LinearSVC + word/char TF-IDF), 0.884 macro-F1 — already trained and
+committed as `models/resume_classifier.joblib`, so the application runs immediately. Subject
+to confirmation once Members 1 and 2 re-run on de-duplicated data.
+
+Confidence scores come from `CalibratedClassifierCV` fitted on the final training set;
+`LinearSVC` has no `predict_proba` of its own. Predictions are identical to the uncalibrated
+model, so calibration affects the displayed percentage only, not accuracy.
 
 ---
 
@@ -139,10 +166,28 @@ Each member works on their own branch and merges through a pull request:
 
 ```
 main
-├── feature/member1-model
-├── feature/member2-model
-└── feature/member3-model
+├── feature/CIT-24-01-0213-model    (Member 1)
+├── feature/CIT-24-01-0247-model    (Member 2)
+└── feature/CIT-24-01-0124-model    (Member 3)
 ```
+
+Work is merged into `main` through pull requests.
 
 Commit messages describe the change (`Add GloVe feature extraction`), not the act of
 committing (`update`, `final`).
+
+---
+
+## Reproducing the results
+
+```bash
+pip install -r requirements.txt
+python src/app.py                                  # runs now - model is committed
+```
+
+To retrain from scratch:
+
+```bash
+python data/download_dataset.py
+jupyter notebook notebooks/Member3_SVM_GRU.ipynb   # or open in Google Colab
+```
