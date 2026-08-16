@@ -1,0 +1,2 @@
+Model,Accuracy,Precision (macro),Recall (macro),F1-Score (macro)
+"SVM (LinearSVC, word+char TF-IDF)",0.8976,0.9241,0.8854,0.8839
