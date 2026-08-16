@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume Screening & Job Category Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f5f6fa;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 12px;
+            padding: 10px 24px;
+            background: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1f6391;
+        }
+        .result {
+            margin-top: 25px;
+            padding: 18px;
+            background: #eafaf1;
+            border-left: 5px solid #27ae60;
+            border-radius: 4px;
+        }
+        .result h2 {
+            margin: 0 0 8px 0;
+            color: #196f3d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resume Screening & Job Category Prediction</h1>
+    <p>Paste resume text below and click Predict to get the predicted job category.</p>
+
+    <form method="POST">
+        <textarea name="resume_text" placeholder="Paste resume text here...">{{ request.form.get('resume_text', '') }}</textarea><br>
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result">
+        <h2>Predicted Category: {{ prediction }}</h2>
+        <p>Confidence: {{ confidence }}%</p>
+    </div>
+    {% endif %}
+</body>
+</html>
